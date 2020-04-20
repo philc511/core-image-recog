@@ -18,5 +18,10 @@ namespace core_image_recog {
             }
             return sum;
         }
+
+        public static double[] Flatten(double[,] twoDArray)
+        {
+            return null;
+        }
     }
 }
