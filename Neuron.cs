@@ -9,16 +9,17 @@ namespace core_image_recog
         public Neuron(int size)
         {
             this.size = size;
-            Bias = 0.0;
+            Bias = -1.0d;
             Weights = new double[size];
-            Array.Fill(Weights, 1.0d);
+            Array.Fill(Weights, 1.0d/size);
         }
         public double Bias { get; set; }
         public double[] Weights { get; set; }
 
         public double Output(double[] x)
         {
-            return Utils.Activate(Utils.Dot(Weights, x) + Bias);
+            var d = Utils.Activate(Utils.Dot(Weights, x) + Bias);
+            return d;
         }
     }
 }
