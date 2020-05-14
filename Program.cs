@@ -1,4 +1,5 @@
 ﻿using System;
+using MathNet.Numerics.LinearAlgebra;
 using MNIST.IO;
 
 namespace core_image_recog
@@ -7,6 +8,8 @@ namespace core_image_recog
     {
         static void Main(string[] args)
         {
+            var m = Matrix<double>.Build.Random(3, 4);
+            Console.WriteLine(m);
             var network = new Network(new int[]{784,15,10});
 
 
@@ -28,6 +31,7 @@ namespace core_image_recog
                 //Console.WriteLine(i.Label.ToString());
                 //break;
                 dataSize++;
+                break;
             }
             totalCost = totalCost / (2*dataSize);
             Console.WriteLine(totalCost);

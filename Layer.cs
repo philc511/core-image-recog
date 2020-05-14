@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using MathNet.Numerics.LinearAlgebra;
 
 namespace core_image_recog
 {
@@ -8,6 +9,9 @@ namespace core_image_recog
         private int size;
         private int numInputs;
         private Neuron[] neurons;
+
+        private Matrix<double> w;
+
 
         public Layer(int size, int numInputs)
         {
@@ -19,6 +23,8 @@ namespace core_image_recog
             {
                 this.neurons[i] = new Neuron(numInputs);
             }
+
+            w = Matrix<double>.Build.Random(size, numInputs);
         }
         public double[] Output(double[] x)
         {
@@ -30,5 +36,9 @@ namespace core_image_recog
             return output;
         }
 
+        public Vector<double> A(Vector<double> x)
+        {
+            return (w * x).Map(a => Utils.Activate(a));
+        }
     }
 }
