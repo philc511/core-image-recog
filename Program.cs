@@ -8,10 +8,7 @@ namespace core_image_recog
     {
         static void Main(string[] args)
         {
-            var m = Matrix<double>.Build.Random(3, 4);
-            Console.WriteLine(m);
             var network = new Network(new int[]{784,15,10});
-
 
             var data = FileReaderMNIST.LoadImagesAndLables(
                     "../../data/train-labels-idx1-ubyte.gz",

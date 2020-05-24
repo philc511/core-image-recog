@@ -1,4 +1,5 @@
 using System;
+using MathNet.Numerics.LinearAlgebra;
 
 namespace core_image_recog
 {
@@ -19,12 +20,13 @@ namespace core_image_recog
 
         public double[] Output(double[] x)
         {
-            var prev = x;
+            var prevVec = Vector<double>.Build.Dense(x);
             for (int i = 0; i < layers.Length; i++)
             {
-                prev = layers[i].Output(prev);
+                prevVec = layers[i].A(prevVec);
             }
-            return prev;
+
+            return prevVec.ToArray();
         }
     }
 }
