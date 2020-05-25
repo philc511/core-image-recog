@@ -18,15 +18,41 @@ namespace core_image_recog
 
         }
 
-        public double[] Output(double[] x)
+        public Vector<double> FeedForward(Vector<double> x)
         {
-            var prevVec = Vector<double>.Build.Dense(x);
-            for (int i = 0; i < layers.Length; i++)
+            var prevVec = x;
+            foreach (var layer in layers)
             {
-                prevVec = layers[i].A(prevVec);
+                layer.FeedForward(prevVec);
+                prevVec = layer.A;
             }
+            return layers[layers.Length-1].A;
+        }
 
-            return prevVec.ToArray();
+        public void BackProp(Vector<double> y)
+        {
+            layers[layers.Length-1].ComputeDelta(y);
+            for (int i = layers.Length - 2 ; i>=0 ; i--)
+            {
+                layers[i].ComputeDelta(layers[i+1].GetWTransposeDelta());
+            }
+        }
+
+        public void AdjustDeltaSums(Vector<double> x)
+        {
+            var prevVec = x;
+            foreach (var layer in layers)
+            {
+                layer.AdjustDeltaSums(prevVec);
+                prevVec = layer.A;
+            }
+        }
+        public void GradDesc(double eta, int m)
+        {
+            foreach (var layer in layers)
+            {
+                layer.GradDesc(eta, m);
+            }
         }
     }
 }

@@ -13,6 +13,14 @@ namespace core_image_recog
 
         private Vector<double> b;
 
+        private Vector<double> deltaBias;
+        private Matrix<double> deltaWeight;
+
+        public Vector<double> A {get; set;}
+        public Vector<double> Z {get; set;}
+
+        public Vector<double> Delta {get; set;}
+
         public Layer(int size, int numInputs)
         {
             this.size = size;
@@ -20,11 +28,40 @@ namespace core_image_recog
 
             w = Matrix<double>.Build.Dense(size, numInputs, 1d/numInputs);
             b = Vector<double>.Build.Dense(size, -1d);
+
+            deltaWeight = Matrix<double>.Build.Dense(size, numInputs, 0d);
+            deltaBias = Vector<double>.Build.Dense(size, 0d);
+
         }
-        public Vector<double> A(Vector<double> x)
+        public void FeedForward(Vector<double> x)
         {
-            var r = w * x + b;
-            return (r).Map(a => Utils.Activate(a));
+            Z = w * x + b;
+            A = Z.Map(a => Utils.Sigma(a));
+        }
+
+        public void ComputeDelta(Vector<double> v)
+        {
+            Delta = v.PointwiseMultiply(Z.Map(a => Utils.SigmaDash(a)));
+        }
+
+        public Vector<double> GetWTransposeDelta()
+        {
+            return w.Transpose() * Delta;
+        }
+
+        public void AdjustDeltaSums(Vector<double> aPrev)
+        {
+            deltaBias += Delta;
+            deltaWeight += Delta.ToColumnMatrix() * aPrev.ToRowMatrix();
+        }
+
+        public void GradDesc(double eta, int m) {
+            var factor = eta / (1d * m);
+            w = w - deltaWeight.Multiply(factor);
+            b = b - deltaBias.Multiply(factor);
+
+            deltaWeight.Clear();
+            deltaBias.Clear();
         }
     }
 }
