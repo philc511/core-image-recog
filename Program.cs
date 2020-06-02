@@ -41,20 +41,29 @@ namespace core_image_recog
 
             Log("Initial cost=" + GetCost(inputs, expected, network));
 
+
             int batchSize = 1000;
-            for (int j = 0; j < 50000; j++)
+            for (int a = 0; a < 100; a++) 
             {
-                var x = inputs[j];
-                var result = network.FeedForward(x);
-                var y = expected[j];
+                for (int i = 0; i < 50000; i+=batchSize)
+                {
+                    for (int j = 0 ; j < batchSize; j++) 
+                    {
+                        var x = inputs[i + j];
+                        var result = network.FeedForward(x);
+                        var y = expected[i + j];
 
-                network.BackProp(y);
-                network.AdjustDeltaSums(x);
+                        network.BackProp(y);
+                        network.AdjustDeltaSums(x);
+                    }
+                    network.GradDesc(0.075, batchSize);
+                    Log("After 1000=" + GetCost(inputs, expected, network));
+                }
+                Log("Epoch");
             }
-            network.GradDesc(0.01, batchSize);
-            Log("After 100=" + GetCost(inputs, expected, network));
-
             Log("Ended");
+
+            
         }
 
         private static double GetCost(Vector<double>[] inputs, Vector<double>[] expected, Network network)
