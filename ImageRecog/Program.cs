@@ -4,6 +4,7 @@ using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
 using MathNet.Numerics.LinearAlgebra;
 using MNIST.IO;
+using NnetLib;
 
 namespace core_image_recog
 {
@@ -34,16 +35,26 @@ namespace core_image_recog
             //     n++;
             // }
 
-            var inputs = (Vector<double>[])Deserialize("C:\\Temp\\Images.dat");
-            var expected =  (Vector<double>[])Deserialize("C:\\Temp\\Labels.dat");
-
+            var inputs = (Vector<double>[])Deserialize("C:\\Users\\Lenovo\\Documents\\temp\\Images.dat");
+            var expected =  (Vector<double>[])Deserialize("C:\\Users\\Lenovo\\Documents\\temp\\Labels.dat");
             Log("Read data in");
+
+            var testExpected = Utils.GetExpectedTestResults(expected, 50000, 10000);
+
+            var guess = new int[10000];
+            var r = new Random();
+            for (int i = 0; i < 10000; i++)
+            {
+                guess[i] = r.Next(0, 10);
+            }
+            Log("score = " + (new Measure()).Score(testExpected, guess));
+            
 
             Log("Initial cost=" + GetCost(inputs, expected, network));
 
 
             int batchSize = 1000;
-            for (int a = 0; a < 100; a++) 
+            for (int a = 0; a < 1; a++) 
             {
                 for (int i = 0; i < 50000; i+=batchSize)
                 {
@@ -56,20 +67,28 @@ namespace core_image_recog
                         network.BackProp(y);
                         network.AdjustDeltaSums(x);
                     }
-                    network.GradDesc(0.075, batchSize);
+                    network.GradDesc(0.3, batchSize);
                     Log("After 1000=" + GetCost(inputs, expected, network));
+
+                    for (int j = 0; j < 10000; j++)
+                    {
+                        var al = network.FeedForward(inputs[50000+j]);
+                        guess[j] = al.MaximumIndex();
+
+                    }
+                    Log("score = " + (new Measure()).Score(testExpected, guess));
+
                 }
                 Log("Epoch");
             }
             Log("Ended");
-
-            
         }
 
         private static double GetCost(Vector<double>[] inputs, Vector<double>[] expected, Network network)
         {
             var cost = 0d;
-            var size = inputs.Length;
+            //var size = inputs.Length;
+            var size = 50000;
             for (int i = 0; i < size; i++)
             {
                 var al = network.FeedForward(inputs[i]);

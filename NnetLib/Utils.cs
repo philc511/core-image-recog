@@ -1,7 +1,7 @@
 using System;
 using MathNet.Numerics.LinearAlgebra;
 
-namespace core_image_recog {
+namespace NnetLib {
     public class Utils
     {
         public static double Sigma(double z)
@@ -39,6 +39,16 @@ namespace core_image_recog {
         public static double Cost(Vector<double> actual, Vector<double> expected)
         {
             return (actual - expected).Map(a => a*a).Sum();
+        }
+
+        public static int[] GetExpectedTestResults(Vector<double>[] expected, int v1, int v2)
+        {
+            int[] results = new int[v2];
+            for (int i = 0; i < v2; i++)
+            {
+                results[i] = expected[v1+i].MaximumIndex();
+            }
+            return results;
         }
     }
 }

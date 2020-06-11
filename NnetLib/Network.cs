@@ -1,7 +1,7 @@
 using System;
 using MathNet.Numerics.LinearAlgebra;
 
-namespace core_image_recog
+namespace NnetLib
 {
     public class Network
     {
