@@ -26,7 +26,7 @@ namespace NnetLib
             this.size = size;
             this.numInputs = numInputs;
 
-            w = Matrix<double>.Build.Dense(size, numInputs, 1d/numInputs);
+            w = Matrix<double>.Build.Dense(size, numInputs, 0d);
             b = Vector<double>.Build.Dense(size, -1d);
 
             deltaWeight = Matrix<double>.Build.Dense(size, numInputs, 0d);
@@ -56,7 +56,7 @@ namespace NnetLib
         }
 
         public void GradDesc(double eta, int m) {
-            var factor = eta / (1d * m);
+            var factor = eta / (1d * m);            
             w = w - deltaWeight.Multiply(factor);
             b = b - deltaBias.Multiply(factor);
 

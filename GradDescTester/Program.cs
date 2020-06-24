@@ -6,38 +6,18 @@ using MathNet.Numerics.LinearAlgebra;
 using MNIST.IO;
 using NnetLib;
 
-namespace core_image_recog
+namespace GradDescTester
 {
     class Program
     {
-        static void MainX(string[] args)
-        {
-            Utils.Log("Starting");
-            Serialize();
-        }
         static void Main(string[] args)
         {
-            Utils.Log("Starting");
+            Log("Starting");
             var network = new Network(new int[] { 784, 30, 10 });
-
-            // var data = FileReaderMNIST.LoadImagesAndLables(
-            //         "../../data/train-labels-idx1-ubyte.gz",
-            //         "../../data/train-images-idx3-ubyte.gz");
-            // double totalCost = 0d;
-
-            // var inputs = new Vector<double>[60000];
-            // var expected = new Vector<double>[60000];
-            // int n = 0;
-            // foreach (var x in data)
-            // {
-            //     inputs[n] = Utils.Flatten(x.AsDouble());
-            //     expected[n] = Utils.ToVector(x.Label);
-            //     n++;
-            // }
 
             var inputs = (Vector<double>[])Deserialize("C:\\Users\\Lenovo\\Documents\\temp\\Images.dat");
             var expected =  (Vector<double>[])Deserialize("C:\\Users\\Lenovo\\Documents\\temp\\Labels.dat");
-            Utils.Log("Read data in");
+            Log("Read data in");
 
             var testExpected = Utils.GetExpectedTestResults(expected, 50000, 10000);
 
@@ -47,15 +27,14 @@ namespace core_image_recog
             {
                 guess[i] = r.Next(0, 10);
             }
-            Utils.Log("score = " + (new Measure()).Score(testExpected, guess));
+            Log("score = " + (new Measure()).Score(testExpected, guess));
             
 
-            Utils.Log("Initial cost=" + GetCost(inputs, expected, network));
+            Log("Initial cost=" + GetCost(inputs, expected, network));
 
 
-            int batchSize = 10;
-            int epochs = 1;
-            for (int a = 0; a < epochs; a++) 
+            int batchSize = 1000;
+            for (int a = 0; a < 1; a++) 
             {
                 for (int i = 0; i < 50000; i+=batchSize)
                 {
@@ -69,20 +48,20 @@ namespace core_image_recog
                         network.AdjustDeltaSums(x);
                     }
                     network.GradDesc(3.0, batchSize);
+                    Log("After 1000=" + GetCost(inputs, expected, network));
+
+                    for (int j = 0; j < 10000; j++)
+                    {
+                        var al = network.FeedForward(inputs[50000+j]);
+                        guess[j] = al.MaximumIndex();
+
+                    }
+                    Log("score = " + (new Measure()).Score(testExpected, guess));
+
                 }
-                Utils.Log("After an epoch" + GetCost(inputs, expected, network));
-
-                for (int j = 0; j < 10000; j++)
-                {
-                    var al = network.FeedForward(inputs[50000+j]);
-                    guess[j] = al.MaximumIndex();
-
-                }
-                Utils.Log("score = " + (new Measure()).Score(testExpected, guess));
-
-                Utils.Log("Epoch");
+                Log("Epoch");
             }
-            Utils.Log("Ended");
+            Log("Ended");
         }
 
         private static double GetCost(Vector<double>[] inputs, Vector<double>[] expected, Network network)
@@ -98,6 +77,10 @@ namespace core_image_recog
             return cost / 2 / size;
         }
 
+        private static void Log(string msg)
+        {
+            Console.WriteLine(DateTime.Now.ToLongTimeString() + ": " + msg);
+        }
         static Object Deserialize(String filename)
         {
             // Declare the hashtable reference.

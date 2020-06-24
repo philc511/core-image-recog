@@ -50,5 +50,11 @@ namespace NnetLib {
             }
             return results;
         }
+
+        public static void Log(string msg)
+        {
+            Console.WriteLine(DateTime.Now.ToLongTimeString() + ": " + msg);
+        }
+
     }
 }

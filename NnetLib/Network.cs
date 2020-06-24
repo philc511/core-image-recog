@@ -31,7 +31,7 @@ namespace NnetLib
 
         public void BackProp(Vector<double> y)
         {
-            layers[layers.Length-1].ComputeDelta(y);
+            layers[layers.Length-1].ComputeDelta(layers[layers.Length-1].A - y);
             for (int i = layers.Length - 2 ; i>=0 ; i--)
             {
                 layers[i].ComputeDelta(layers[i+1].GetWTransposeDelta());
